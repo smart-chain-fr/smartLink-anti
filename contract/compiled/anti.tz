@@ -13,8 +13,7 @@
                 (pair (address %admin)
                       (pair (address %reserve)
                             (pair (nat %total_supply)
-                                  (pair (big_map %metadata string bytes)
-                                        (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string bytes))))))))) ;
+                                  (pair (big_map %metadata string bytes) (big_map %token_metadata string bytes))))))) ;
   code { UNPAIR ;
          IF_LEFT
            { IF_LEFT

@@ -60,6 +60,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 var signer_1 = require("@taquito/signer");
 var taquito_1 = require("@taquito/taquito");
+var utils_1 = require("@taquito/utils");
 var anti_json_1 = __importDefault(require("./anti.json"));
 var dotenv = __importStar(require("dotenv"));
 dotenv.config(({ path: __dirname + '/.env' }));
@@ -75,8 +76,19 @@ var allowances = new taquito_1.MichelsonMap();
 var admin = "tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i";
 var reserve_address = 'tz1RyejUffjfnHzWoRp1vYyZwGnfPuHsD5F5';
 var total_supply = 777777777777;
-var metadata = new taquito_1.MichelsonMap();
-var token_metadata = new taquito_1.MichelsonMap();
+var metadata = taquito_1.MichelsonMap.fromLiteral({
+    "name": utils_1.char2Bytes("ANTI token"),
+    "decimals": utils_1.char2Bytes("3"),
+    "symbol": utils_1.char2Bytes("ANTI"),
+    "description": utils_1.char2Bytes("Decentralized escrow platform for Web 3.0"),
+    "authors": utils_1.char2Bytes("SmartLink Dev Team"),
+    "homepage": utils_1.char2Bytes("https://smartlink.so/"),
+    "icon": utils_1.char2Bytes("ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm")
+});
+var tokeninfo = taquito_1.MichelsonMap.fromLiteral({
+    token_id: 1,
+    token_info: metadata
+});
 function orig() {
     return __awaiter(this, void 0, void 0, function () {
         var store, originated, error_1;
@@ -90,7 +102,7 @@ function orig() {
                         'allowances': allowances,
                         'total_supply': total_supply,
                         'metadata': metadata,
-                        'token_metadata': token_metadata
+                        'token_metadata': taquito_1.MichelsonMap.fromLiteral({ 1: tokeninfo })
                     };
                     _a.label = 1;
                 case 1:
