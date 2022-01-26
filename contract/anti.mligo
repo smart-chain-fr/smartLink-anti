@@ -172,7 +172,7 @@ let transfer (param : transfer) (storage : storage) : result =
     let final_value : nat = to_balance + valued in
     let to_balance : nat option = Some(final_value) in
     Big_map.update reserve_address to_balance tokens in
-    // 95% sent to recipient
+    // 92% sent to recipient
     let tokens =
     let to_balance =
       match Big_map.find_opt param.address_to tokens with

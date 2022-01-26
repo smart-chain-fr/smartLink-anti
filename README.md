@@ -21,4 +21,4 @@ npm i @taquito/signer
 npm i dotenv
 npm i nvm
 
-node deploy.js
+node deploy/deploy.js
