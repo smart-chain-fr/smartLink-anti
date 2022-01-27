@@ -21,17 +21,27 @@ const admin = "tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i"
 const reserve_address = 'tz1RyejUffjfnHzWoRp1vYyZwGnfPuHsD5F5'
 const total_supply = 777777777777
 let metadata = MichelsonMap.fromLiteral({
-    "name" : char2Bytes("ANTI token"),
+    "name" : char2Bytes("SmartLink Anti token"),
     "decimals": char2Bytes("3"),
     "symbol" : char2Bytes("ANTI"),
-    "description": char2Bytes("Decentralized escrow platform for Web 3.0"),
+    "description": char2Bytes("A Deflationnary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0"),
+    "interfaces": char2Bytes("TZIP-007 TZIP-016"),
     "authors": char2Bytes("SmartLink Dev Team"),
     "homepage": char2Bytes("https://smartlink.so/"),
     "icon": char2Bytes("ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm"),
   });
-let tokeninfo = MichelsonMap.fromLiteral({
-    token_id:1,
+let token_metadata_entry_anti = {
+    token_id:'1',
     token_info:metadata,
+  };
+
+let token_metadata = new MichelsonMap();
+token_metadata.set('0', token_metadata_entry_anti);
+
+
+MichelsonMap.fromLiteral({
+    token_id:'0',
+    token_info:token_metadata_entry_anti,
   });
 
 async function orig() {
@@ -43,7 +53,7 @@ async function orig() {
         'allowances' : allowances,
         'total_supply' : total_supply,
         'metadata' : metadata,
-        'token_metadata' : MichelsonMap.fromLiteral({1:tokeninfo}),
+        'token_metadata' : token_metadata,
     }
 
     try {

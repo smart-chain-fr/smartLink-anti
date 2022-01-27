@@ -77,17 +77,24 @@ var admin = "tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i";
 var reserve_address = 'tz1RyejUffjfnHzWoRp1vYyZwGnfPuHsD5F5';
 var total_supply = 777777777777;
 var metadata = taquito_1.MichelsonMap.fromLiteral({
-    "name": utils_1.char2Bytes("ANTI token"),
+    "name": utils_1.char2Bytes("SmartLink Anti token"),
     "decimals": utils_1.char2Bytes("3"),
     "symbol": utils_1.char2Bytes("ANTI"),
-    "description": utils_1.char2Bytes("Decentralized escrow platform for Web 3.0"),
+    "description": utils_1.char2Bytes("A Deflationnary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0"),
+    "interfaces": utils_1.char2Bytes("TZIP-007 TZIP-016"),
     "authors": utils_1.char2Bytes("SmartLink Dev Team"),
     "homepage": utils_1.char2Bytes("https://smartlink.so/"),
     "icon": utils_1.char2Bytes("ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm")
 });
-var tokeninfo = taquito_1.MichelsonMap.fromLiteral({
-    token_id: 1,
+var token_metadata_entry_anti = {
+    token_id: '1',
     token_info: metadata
+};
+var token_metadata = new taquito_1.MichelsonMap();
+token_metadata.set('0', token_metadata_entry_anti);
+taquito_1.MichelsonMap.fromLiteral({
+    token_id: '0',
+    token_info: token_metadata_entry_anti
 });
 function orig() {
     return __awaiter(this, void 0, void 0, function () {
@@ -102,7 +109,7 @@ function orig() {
                         'allowances': allowances,
                         'total_supply': total_supply,
                         'metadata': metadata,
-                        'token_metadata': taquito_1.MichelsonMap.fromLiteral({ 1: tokeninfo })
+                        'token_metadata': token_metadata
                     };
                     _a.label = 1;
                 case 1:
