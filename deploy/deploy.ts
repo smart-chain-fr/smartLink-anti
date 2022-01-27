@@ -29,6 +29,8 @@ let metadata = MichelsonMap.fromLiteral({
     "authors": char2Bytes("SmartLink Dev Team"),
     "homepage": char2Bytes("https://smartlink.so/"),
     "icon": char2Bytes("ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm"),
+    "supply": char2Bytes("777777777.777"),
+    "mintable": char2Bytes("False"),    
   });
 let token_metadata_entry_anti = {
     token_id:'1',

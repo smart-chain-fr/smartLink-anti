@@ -26,11 +26,6 @@ type approve =
   { spender : address;
     value : nat }
 
-type mintOrBurn =
-  [@layout:comb]
-  { quantity : int ;
-    target : address }
-
 type allowance_key =
   [@layout:comb]
   { owner : address;
@@ -72,7 +67,6 @@ type storage =
 type parameter =
   | Transfer of transfer
   | Approve of approve
-  | MintOrBurn of mintOrBurn
   | GetAllowance of getAllowance
   | GetBalance of getBalance
   | GetTotalSupply of getTotalSupply
@@ -201,25 +195,6 @@ let approve (param : approve) (storage : storage) : result =
     (([] : operation list), { storage with allowances = allowances })
   end
 
-let mintOrBurn (param : mintOrBurn) (storage : storage) : result =
-  begin
-    if Tezos.sender <> storage.admin
-    then failwith "OnlyAdmin"
-    else ();
-    let tokens = storage.tokens in
-    let old_balance =
-      match Big_map.find_opt param.target tokens with
-      | None -> 0n
-      | Some bal -> bal in
-    let new_balance =
-      match is_nat (old_balance + param.quantity) with
-      | None -> (failwith "Cannot burn more than the target's balance." : nat)
-      | Some bal -> bal in
-    let tokens = Big_map.update param.target (maybe new_balance) storage.tokens in
-    let total_supply = abs (storage.total_supply + param.quantity) in
-    (([] : operation list), { storage with tokens = tokens ; total_supply = total_supply })
-  end
-
 let getAllowance (param : getAllowance) (storage : storage) : operation list =
   let value =
     match Big_map.find_opt param.request storage.allowances with
@@ -244,7 +219,6 @@ let main (param, storage : parameter * storage) : result =
     match param with
     | Transfer param -> transfer param storage
     | Approve param -> approve param storage
-    | MintOrBurn param -> mintOrBurn param storage
     | GetAllowance param -> (getAllowance param storage, storage)
     | GetBalance param -> (getBalance param storage, storage)
     | GetTotalSupply param -> (getTotalSupply param storage, storage)
