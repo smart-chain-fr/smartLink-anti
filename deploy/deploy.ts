@@ -21,7 +21,7 @@ const admin = "tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i"
 const reserve_address = 'tz1RyejUffjfnHzWoRp1vYyZwGnfPuHsD5F5'
 const total_supply = 777777777777
 let metadata = MichelsonMap.fromLiteral({
-    "name" : char2Bytes("SmartLink Anti token"),
+    "name" : char2Bytes("Anti token"),
     "decimals": char2Bytes("3"),
     "symbol" : char2Bytes("ANTI"),
     "description": char2Bytes("A Deflationnary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0"),
