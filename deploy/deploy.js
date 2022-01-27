@@ -84,7 +84,9 @@ var metadata = taquito_1.MichelsonMap.fromLiteral({
     "interfaces": utils_1.char2Bytes("TZIP-007 TZIP-016"),
     "authors": utils_1.char2Bytes("SmartLink Dev Team"),
     "homepage": utils_1.char2Bytes("https://smartlink.so/"),
-    "icon": utils_1.char2Bytes("ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm")
+    "icon": utils_1.char2Bytes("ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm"),
+    "supply": utils_1.char2Bytes("777777777.777"),
+    "mintable": utils_1.char2Bytes("False")
 });
 var token_metadata_entry_anti = {
     token_id: '1',
