@@ -70,16 +70,19 @@ var pk = "edskS8x3MqxnSVLix29fvBh7QBoTt6WLERyatEfTpRzE1XF26Aqy2ii7cBLMwpcE6u6fnj
 var Tezos = new taquito_1.TezosToolkit(rpc);
 var signer = new signer_1.InMemorySigner(pk);
 Tezos.setProvider({ signer: signer });
-var tokens = new taquito_1.MichelsonMap();
-tokens.set("tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i", 777777777777);
+var ledger = new taquito_1.MichelsonMap();
+ledger.set("tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i", 777777777777);
 var allowances = new taquito_1.MichelsonMap();
 var admin = "tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i";
 var reserve_address = 'tz1RyejUffjfnHzWoRp1vYyZwGnfPuHsD5F5';
+var burn_address = 'tz1burnburnburnburnburnburnburjAYjjX';
+var initial_supply = 777777777777;
 var total_supply = 777777777777;
+var burned_supply = 0;
 var metadata = taquito_1.MichelsonMap.fromLiteral({
-    "name": utils_1.char2Bytes("SmartLink Anti token"),
+    "name": utils_1.char2Bytes("Anti token"),
     "decimals": utils_1.char2Bytes("3"),
-    "symbol": utils_1.char2Bytes("ANTI"),
+    "symbol": utils_1.char2Bytes("ANTI-TEST001-HANGZHOU"),
     "description": utils_1.char2Bytes("A Deflationnary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0"),
     "interfaces": utils_1.char2Bytes("TZIP-007 TZIP-016"),
     "authors": utils_1.char2Bytes("SmartLink Dev Team"),
@@ -107,9 +110,12 @@ function orig() {
                     store = {
                         'admin': admin,
                         'reserve': reserve_address,
-                        'tokens': tokens,
+                        'ledger': ledger,
                         'allowances': allowances,
+                        'initial_supply': initial_supply,
                         'total_supply': total_supply,
+                        'burned_supply': burned_supply,
+                        'burn_address': burn_address,
                         'metadata': metadata,
                         'token_metadata': token_metadata
                     };

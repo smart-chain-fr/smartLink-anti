@@ -46,7 +46,7 @@ type getTotalSupply =
   { request : unit ;
     callback : nat contract }
 
-type tokens = (address, nat) big_map
+type ledger = (address, nat) big_map
 type allowances = (allowance_key, nat) big_map
 
 type token_metadata_entry = {
@@ -55,11 +55,14 @@ type token_metadata_entry = {
 }
 type storage =
   [@layout:comb]
-  { tokens : tokens;
+  { ledger : ledger;
     allowances : allowances;
     admin : address;
     reserve : address;
+    burn_address : address;
+    initial_supply : nat;
     total_supply : nat;
+    burned_supply : nat;
     metadata: (string, bytes) big_map;
     token_metadata : (nat, token_metadata_entry) big_map
   }
@@ -83,7 +86,7 @@ let transfer (param : transfer) (storage : storage) : result =
 
   let address_to : address = param.address_to in
   let allowances = storage.allowances in
-  let tokens = storage.tokens in
+  let ledger = storage.ledger in
 
   // Check allowance amount
   let allowances =
@@ -102,16 +105,16 @@ let transfer (param : transfer) (storage : storage) : result =
       Big_map.update allowance_key (maybe authorized_value) allowances in
 
   // Check balance amount
-  let tokens =
+  let ledger =
     let from_balance =
-      match Big_map.find_opt param.address_from tokens with
+      match Big_map.find_opt param.address_from ledger with
       | Some value -> value
       | None -> 0n in
     let from_balance =
       match is_nat (from_balance - param.value) with
       | None -> (failwith "NotEnoughBalance" : nat)
       | Some from_balance -> from_balance in
-    Big_map.update param.address_from (maybe from_balance) tokens in
+    Big_map.update param.address_from (maybe from_balance) ledger in
 
   let find_set_baker_camel : set_baker_freeze contract option = Tezos.get_entrypoint_opt "%setBaker" address_to in
   let find_set_baker_pascal : set_baker_option contract option = Tezos.get_entrypoint_opt "%set_baker" address_to in
@@ -132,52 +135,58 @@ let transfer (param : transfer) (storage : storage) : result =
 
   if (find_set_admin(find_set_admin_camel, find_set_admin_pascal, find_set_admin_full) || find_set_baker(find_set_baker_camel, find_set_baker_pascal, find_set_baker_basic)) then
     // 100% sent to recipient
-    let tokens =
+    let ledger =
     let to_balance =
-      match Big_map.find_opt param.address_to tokens with
+      match Big_map.find_opt param.address_to ledger with
       | Some value -> value
       | None -> 0n in
     let final_value : nat = to_balance + param.value in
     let to_balance : nat option = Some(final_value) in
-    Big_map.update param.address_to to_balance tokens in
-    (([] : operation list), { storage with tokens = tokens; allowances = allowances })    
+    Big_map.update param.address_to to_balance ledger in
+    (([] : operation list), { storage with ledger = ledger; allowances = allowances })    
   else
-    let burn_address : address = ("tz1burnburnburnburnburnburnburjAYjjX" : address) in
+    let burn_address : address = storage.burn_address in
     let reserve_address : address = storage.reserve in
+    let burn_to_update : nat = abs(param.value * 7) in
+    let burn_to_update_normalised : nat = burn_to_update / 100n in
+    let final_burned_supply : nat = storage.burned_supply + burn_to_update_normalised in 
+    let final_total_supply : nat = abs(storage.total_supply - burn_to_update_normalised) in
     // 7% token burn
-    let tokens =
-    let to_balance : nat =
-      match Big_map.find_opt burn_address tokens with
-      | Some value -> value
-      | None -> 0n in
-    let valuec : nat = abs(param.value * 7) in
-    let valued : nat = valuec / 100n in
-    let final_value : nat = to_balance + valued in
-    let to_balance : nat option = Some(final_value) in
-    Big_map.update burn_address to_balance tokens in
+    let ledger =
+      let to_balance : nat =
+        match Big_map.find_opt burn_address ledger with
+        | Some value -> value
+        | None -> 0n
+      in
+      let final_value : nat = to_balance + burn_to_update_normalised in
+      let to_balance : nat option = Some(final_value) in
+      Big_map.update burn_address to_balance ledger
+    in
     // 1% sent to treasury
-    let tokens =
-    let to_balance : nat =
-      match Big_map.find_opt reserve_address tokens with
-      | Some value -> value
-      | None -> 0n in
-    let valuec : nat = abs(param.value * 1) in
-    let valued : nat = valuec / 100n in
-    let final_value : nat = to_balance + valued in
-    let to_balance : nat option = Some(final_value) in
-    Big_map.update reserve_address to_balance tokens in
+    let ledger =
+      let to_balance : nat =
+        match Big_map.find_opt reserve_address ledger with
+        | Some value -> value
+        | None -> 0n in
+      let valuec : nat = abs(param.value * 1) in
+      let valued : nat = valuec / 100n in
+      let final_value : nat = to_balance + valued in
+      let to_balance : nat option = Some(final_value) in
+      Big_map.update reserve_address to_balance ledger
+    in
     // 92% sent to recipient
-    let tokens =
-    let to_balance =
-      match Big_map.find_opt param.address_to tokens with
-      | Some value -> value
-      | None -> 0n in
-    let valuec : nat = abs(param.value * 92) in
-    let valued : nat = valuec / 100n in
-    let final_value : nat = to_balance + valued in
-    let to_balance : nat option = Some(final_value) in
-    Big_map.update param.address_to to_balance tokens in
-    (([] : operation list), { storage with tokens = tokens; allowances = allowances })
+    let ledger =
+      let to_balance =
+        match Big_map.find_opt param.address_to ledger with
+        | Some value -> value
+        | None -> 0n in
+      let valuec : nat = abs(param.value * 92) in
+      let valued : nat = valuec / 100n in
+      let final_value : nat = to_balance + valued in
+      let to_balance : nat option = Some(final_value)
+    in
+    Big_map.update param.address_to to_balance ledger in
+    (([] : operation list), { storage with ledger = ledger; allowances = allowances; burned_supply = final_burned_supply; total_supply = final_total_supply })
 
 
 let approve (param : approve) (storage : storage) : result =
@@ -204,7 +213,7 @@ let getAllowance (param : getAllowance) (storage : storage) : operation list =
 
 let getBalance (param : getBalance) (storage : storage) : operation list =
   let value =
-    match Big_map.find_opt param.owner storage.tokens with
+    match Big_map.find_opt param.owner storage.ledger with
     | Some value -> value
     | None -> 0n in
   [Tezos.transaction value 0mutez param.callback]
