@@ -15,10 +15,10 @@ const signer = new InMemorySigner(pk);
 Tezos.setProvider({ signer: signer })
 
 let ledger = new MichelsonMap();
-ledger.set("tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i", 777777777777);
+ledger.set("tz1ic7L44bmZc9xjmLf8FbxMJPJtHPgA5csv", 777777777777);
 let allowances = new MichelsonMap();
-const admin = "tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i"
-const reserve_address = 'tz1RyejUffjfnHzWoRp1vYyZwGnfPuHsD5F5'
+const admin = "tz1ic7L44bmZc9xjmLf8FbxMJPJtHPgA5csv"
+const reserve_address = 'tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2'
 const burn_address = 'tz1burnburnburnburnburnburnburjAYjjX'
 const initial_supply = 777777777777
 const total_supply = 777777777777
@@ -26,7 +26,7 @@ const burned_supply = 0
 let metadata = MichelsonMap.fromLiteral({
     "name" : char2Bytes("Anti token"),
     "decimals": char2Bytes("3"),
-    "symbol" : char2Bytes("ANTI-TEST001-HANGZHOU"),
+    "symbol" : char2Bytes("ANTI"),
     "description": char2Bytes("A Deflationnary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0"),
     "interfaces": char2Bytes("TZIP-007 TZIP-016"),
     "authors": char2Bytes("SmartLink Dev Team"),
