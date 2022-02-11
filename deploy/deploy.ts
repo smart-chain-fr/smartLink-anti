@@ -6,10 +6,10 @@ import * as dotenv from 'dotenv'
 
 dotenv.config(({path:__dirname+'/.env'}))
 
-const rpc = "https://hangzhounet.api.tez.ie"  // "https://rpc.hangzhounet.teztnets.xyz" // HANGZOUNET
-//const rpc = "https://rpc.tzstats.com" // https://mainnet.api.tez.ie // MAINNET
+//const rpc = "https://hangzhounet.api.tez.ie"  // "https://rpc.hangzhounet.teztnets.xyz" // HANGZOUNET
+const rpc = "https://rpc.tzstats.com" // https://mainnet.api.tez.ie // MAINNET
 
-const pk: string = "edskS8x3MqxnSVLix29fvBh7QBoTt6WLERyatEfTpRzE1XF26Aqy2ii7cBLMwpcE6u6fnj72gNRitAbXQjCS9eGncR7P4C3hy8";
+const pk: string = "";
 const Tezos = new TezosToolkit(rpc);
 const signer = new InMemorySigner(pk);
 Tezos.setProvider({ signer: signer })
@@ -27,7 +27,7 @@ let metadata = MichelsonMap.fromLiteral({
     "name" : char2Bytes("Anti token"),
     "decimals": char2Bytes("3"),
     "symbol" : char2Bytes("ANTI"),
-    "description": char2Bytes("A Deflationnary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0"),
+    "description": char2Bytes("The ANTI token is a fungible deflationary asset."),
     "interfaces": char2Bytes("TZIP-007 TZIP-016"),
     "authors": char2Bytes("SmartLink Dev Team"),
     "homepage": char2Bytes("https://smartlink.so/"),

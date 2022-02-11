@@ -64,17 +64,17 @@ var utils_1 = require("@taquito/utils");
 var anti_json_1 = __importDefault(require("./anti.json"));
 var dotenv = __importStar(require("dotenv"));
 dotenv.config(({ path: __dirname + '/.env' }));
-var rpc = "https://hangzhounet.api.tez.ie"; // "https://rpc.hangzhounet.teztnets.xyz" // HANGZOUNET
-//const rpc = "https://rpc.tzstats.com" // https://mainnet.api.tez.ie // MAINNET
+//const rpc = "https://hangzhounet.api.tez.ie"  // "https://rpc.hangzhounet.teztnets.xyz" // HANGZOUNET
+var rpc = "https://rpc.tzstats.com"; // https://mainnet.api.tez.ie // MAINNET
 var pk = "edskS8x3MqxnSVLix29fvBh7QBoTt6WLERyatEfTpRzE1XF26Aqy2ii7cBLMwpcE6u6fnj72gNRitAbXQjCS9eGncR7P4C3hy8";
 var Tezos = new taquito_1.TezosToolkit(rpc);
 var signer = new signer_1.InMemorySigner(pk);
 Tezos.setProvider({ signer: signer });
 var ledger = new taquito_1.MichelsonMap();
-ledger.set("tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i", 777777777777);
+ledger.set("tz1ic7L44bmZc9xjmLf8FbxMJPJtHPgA5csv", 777777777777);
 var allowances = new taquito_1.MichelsonMap();
-var admin = "tz1hA7UiKADZQbH8doJDiFY2bacWk8yAaU9i";
-var reserve_address = 'tz1RyejUffjfnHzWoRp1vYyZwGnfPuHsD5F5';
+var admin = "tz1ic7L44bmZc9xjmLf8FbxMJPJtHPgA5csv";
+var reserve_address = 'tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2';
 var burn_address = 'tz1burnburnburnburnburnburnburjAYjjX';
 var initial_supply = 777777777777;
 var total_supply = 777777777777;
@@ -82,8 +82,8 @@ var burned_supply = 0;
 var metadata = taquito_1.MichelsonMap.fromLiteral({
     "name": utils_1.char2Bytes("Anti token"),
     "decimals": utils_1.char2Bytes("3"),
-    "symbol": utils_1.char2Bytes("ANTI-TEST001-HANGZHOU"),
-    "description": utils_1.char2Bytes("A Deflationnary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0"),
+    "symbol": utils_1.char2Bytes("ANTI"),
+    "description": utils_1.char2Bytes("The ANTI token is a fungible deflationary asset."),
     "interfaces": utils_1.char2Bytes("TZIP-007 TZIP-016"),
     "authors": utils_1.char2Bytes("SmartLink Dev Team"),
     "homepage": utils_1.char2Bytes("https://smartlink.so/"),
