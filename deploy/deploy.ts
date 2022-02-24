@@ -36,18 +36,12 @@ let metadata = MichelsonMap.fromLiteral({
     "mintable": char2Bytes("False"),    
   });
 let token_metadata_entry_anti = {
-    token_id:'1',
+    token_id:'0',
     token_info:metadata,
   };
 
 let token_metadata = new MichelsonMap();
 token_metadata.set('0', token_metadata_entry_anti);
-
-
-MichelsonMap.fromLiteral({
-    token_id:'0',
-    token_info:token_metadata_entry_anti,
-  });
 
 async function orig() {
 
