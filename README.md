@@ -1,5 +1,11 @@
 # Anti-Token
-### *This is a description of the deflationary token in LIGO !*
+### *This is a description of the SmartLink deflationary token in LIGO !*
+
+#### Introduction
+
+The system is comprised of a deflationnary "mechanical" FA12 token contract.
+
+In order to incentivize people using the token in Smart-Contrat, a fee is taken if the receiver of a transfer is a user.
 
 | Attribute | Value | 
 |---|---|
@@ -17,20 +23,21 @@
 | Reserves | tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2 | 
 | Burn address | tz1burnburnburnburnburnburnburjAYjjX | 
 
+
 ## A. Installation
 
-##### I. Dependancies
+#### I. Dependancies
 
 `npm i @taquito/taquit`
 `npm i @taquito/signer`
 `npm i dotenv`
 `npm i nvm`
 
-##### II. Compilation of the ANTI Token .tz
+#### II. Compilation of the ANTI Token .tz
 - At root, with docker run :
 `docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:next compile contract contract/anti.mligo > contract/compiled/anti.tz`
 
-##### III. Prepare deployment of the ANTI Token
+#### III. Prepare deployment of the ANTI Token
 - At root, with docker run :
 `docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:next compile contract contract/anti.mligo --michelson-format json > deploy/anti.json`
 
@@ -43,13 +50,11 @@
 
 ## B. System Architecture
 
-##### I. The ANTI Token
+#### I. The ANTI Token
 
-The system is comprised of a deflationnary "mechanical" FA12 token contract.
+The ANTI token can be used as any other FA12 asset, and is not mintable. The amount of the taxe is 7% burn and 1% sent to reserve.
 
-In order to incentivize people using the token in Smart-Contrat, a fee is taken if the receiver of a transfer is a user.
-
-##### II. Finding Smart-Contract
+#### II. Finding Smart-Contract
 
 In order to find if the receiver of the token is a contract, the ANTI token will scan for the following entrypoints and arguments :
 
