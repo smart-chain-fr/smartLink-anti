@@ -17,7 +17,7 @@ In order to incentivize people using the token in Smart-Contrat, a fee is taken 
 | Authors	| SmartLink Dev Team | 
 | Homepage	| https://smartlink.so/ | 
 | Icon	| ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm | 
-| Initial supply |	777 777 777.777 | 
+| Initial supply |	777 777 777 777.777 | 
 | Mintable	| FALSE | 
 | Admin | tz1ic7L44bmZc9xjmLf8FbxMJPJtHPgA5csv | 
 | Reserves | tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2 | 
