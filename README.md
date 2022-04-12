@@ -1,6 +1,8 @@
 # Anti-Token
 ### *This is a description of the deflationary token in LIGO !*
 
+| Attribute | Value | 
+|---|---|
 | name | Anti token | 
 | decimal |	3 | 
 | symbol	| ANTI | 
