@@ -1,4 +1,4 @@
-# Anti-Token
+# Anti-Token : The first mechanical token
 ### *This is a description of the SmartLink deflationary token in LIGO !*
 
 #### Introduction
@@ -67,3 +67,6 @@ In order to find if the receiver of the token is a contract, the ANTI token will
 | %set_admin	       | { address : address }
 | %set_administrator | { address : address }
 
+#### III. About
+
+The mechanical token is a genuine and innovative idea of Smart-Chain.
