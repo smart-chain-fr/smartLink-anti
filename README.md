@@ -1,72 +1,81 @@
 # Anti-Token : The first mechanical token
-### *This is a description of the SmartLink deflationary token in LIGO !*
 
-#### Introduction
+*This is a description of the SmartLink deflationary token in LIGO !*
 
-The system is comprised of a deflationnary "mechanical" FA12 token contract.
+## Introduction
 
-In order to incentivize people using the token in Smart-Contrat, a fee is taken if the receiver of a transfer is a user.
+The system is comprised of a deflationary "mechanical" FA12 token contract.
 
-| Attribute | Value | 
+In order to incentivize people using the token in Smart-Contract, a fee is taken
+if the receiver of a transfer is a user.
+
+| Attribute | Value |
 |---|---|
-| Name | Anti token | 
-| Decimal |	3 | 
-| Symbol	| ANTI | 
-| Description	| A Deflationary token for https://smartlink.so/ the Decentralized escrow platform for Web 3.0 | 
-| Interface	| TZIP-007 TZIP-016 | 
-| Authors	| SmartLink Dev Team | 
-| Homepage	| https://smartlink.so/ | 
-| Icon	| ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm | 
-| Initial supply |	777 777 777 777.777 | 
-| Mintable	| FALSE | 
-| Admin | tz1ic7L44bmZc9xjmLf8FbxMJPJtHPgA5csv | 
-| Reserves | tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2 | 
-| Burn address | tz1burnburnburnburnburnburnburjAYjjX | 
+| Name | Anti token |
+| Decimal | 3 |
+| Symbol | ANTI |
+| Description | A Deflationary token for <https://smartlink.so/> the Decentralized escrow platform for Web 3.0 |
+| Interface | TZIP-007 TZIP-016 |
+| Authors | SmartLink Dev Team |
+| Homepage | <https://smartlink.so/> |
+| Icon | ipfs://QmRPwZSAUkU6nZNor1qoHu4aajPHYpMXrkyZNi8EaNWAmm |
+| Initial supply | 777 777 777 777.777 |
+| Mintable | FALSE |
+| Admin | tz1ic7L44bmZc9xjmLf8FbxMJPJtHPgA5csv |
+| Reserves | tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2 |
+| Burn address | tz1burnburnburnburnburnburnburjAYjjX |
 
+## Prerequisites
 
-## A. Installation
+The contract is written in cameligo flavour of [https://ligolang.org/](LigoLANG),
+to be able to compile the contract, you need either:
 
-#### I. Dependancies
+- a [ligo binary](https://ligolang.org/docs/intro/installation#static-linux-binary),
+  in this case, to use the binary, you need to have set up a `LIGO` environment variable,
+  pointing to the binary (see [Makefile](./Makefile))
+- or docker
 
-`npm i @taquito/taquit`
-`npm i @taquito/signer`
-`npm i dotenv`
-`npm i nvm`
+You also need to have [nodejs](https://nodejs.org/en/) installed, up to version 14.
 
-#### II. Compilation of the ANTI Token .tz
-- At root, with docker run :
-`docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:next compile contract contract/anti.mligo > contract/compiled/anti.tz`
+## Usage
 
-#### III. Prepare deployment of the ANTI Token
-- At root, with docker run :
-`docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:next compile contract contract/anti.mligo --michelson-format json > deploy/anti.json`
+Run `make install` to install dependencies.
 
-#### IV. Deployment
-- In the folder /deploy, run :
-`tsc deploy/deploy.ts --resolveJsonModule -esModuleInterop`
-- And then when the deploy.js file is created, run :
-`node deploy/deploy.js`
+Run `make` to see available commands.
 
+### Compilation of the ANTI Token
 
-## B. System Architecture
+Run `make compile`
 
-#### I. The ANTI Token
+### Deployment
+
+There is a [tezos sandbox](https://gitlab.com/tezos/flextesa) integrated in this
+repository, if you wish to use it, run `make sandbox-start`.
+
+Then, just run `make deploy` to deploy the contract on the sandbox.
+
+If you wish to deploy on other networks, you need to edit the `.env` at the root of
+this repository, it should have been generated when you runned `make install`.
+
+## System Architecture
+
+### The ANTI Token
 
 The ANTI token can be used as any other FA12 asset, and is not mintable. The amount of the taxe is 7% burn and 1% sent to reserve.
 
-#### II. Finding Smart-Contract
+### Finding Smart-Contract
 
 In order to find if the receiver of the token is a contract, the ANTI token will scan for the following entrypoints and arguments :
 
-| Attribute | Value | 
+| Attribute | Value |
 |---|---|
-| %setBaker	         | { baker : key_hash option ; freezeBaker : bool }
-| %set_baker	       | { baker : key_hash option }
-| %baker	           | { baker : key_hash }
-| %setAdmin	         | { address : address }
-| %set_admin	       | { address : address }
+| %setBaker          | { baker : key_hash option ; freezeBaker : bool }
+| %set_baker        | { baker : key_hash option }
+| %baker            | { baker : key_hash }
+| %setAdmin          | { address : address }
+| %set_admin        | { address : address }
 | %set_administrator | { address : address }
 
-#### III. About
+### About
 
 The mechanical token is a genuine and innovative idea of Smart-Chain.
