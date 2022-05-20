@@ -1,20 +1,3 @@
-type set_baker_freeze =
-  [@layout:comb]
-  { baker : key_hash option ;
-    freezeBaker : bool }
-
-type set_baker_option =
-  [@layout:comb]
-  { baker : key_hash option }
-
-type set_baker =
-  [@layout:comb]
-  { baker : key_hash }
-
-type set_admin =
-  [@layout:comb]
-  { address : address }
-
 type transfer =
   [@layout:comb]
   { [@annot:from] address_from : address;
@@ -116,24 +99,14 @@ let transfer (param : transfer) (storage : storage) : result =
       | Some from_balance -> from_balance in
     Big_map.update param.address_from (maybe from_balance) ledger in
 
-  let find_set_baker_camel : set_baker_freeze contract option = Tezos.get_entrypoint_opt "%setBaker" address_to in
-  let find_set_baker_pascal : set_baker_option contract option = Tezos.get_entrypoint_opt "%set_baker" address_to in
-  let find_set_baker_basic : set_baker contract option = Tezos.get_entrypoint_opt "%baker" address_to in
-  let find_set_admin_camel : set_admin contract option = Tezos.get_entrypoint_opt "%setAdmin" address_to in
-  let find_set_admin_pascal : set_admin contract option = Tezos.get_entrypoint_opt "%set_admin" address_to in
-  let find_set_admin_full : set_admin contract option = Tezos.get_entrypoint_opt "%set_administrator" address_to in
-
-  let find_set_baker (a, b, c : set_baker_freeze contract option * set_baker_option contract option * set_baker contract option ) : bool =
-  match a,b,c with
-  | None, None, None -> false
-  | _, _, _ -> true in
-
-  let find_set_admin (a, b, c : set_admin contract option * set_admin contract option * set_admin contract option ) : bool =
-  match a,b,c with
-  | None, None, None -> false
-  | _, _, _ -> true in
-
-  if (find_set_admin(find_set_admin_camel, find_set_admin_pascal, find_set_admin_full) || find_set_baker(find_set_baker_camel, find_set_baker_pascal, find_set_baker_basic)) then
+  //Check if the given address is an implicit account (i.e tz1...) 
+  let is_address_implicit(elt: address) : bool = 
+      let pack_elt : bytes = Bytes.pack elt in
+      let is_imp : bytes = Bytes.sub 6n 1n pack_elt in
+      ( is_imp = 0x00 )
+  in
+  if (is_address_implicit(address_to)) then
+    // case of address_to is KT1....
     // 100% sent to recipient
     let ledger =
     let to_balance =
@@ -145,6 +118,7 @@ let transfer (param : transfer) (storage : storage) : result =
     Big_map.update param.address_to to_balance ledger in
     (([] : operation list), { storage with ledger = ledger; allowances = allowances })
   else
+    // case of address_to is tz1....
     let burn_address : address = storage.burn_address in
     let reserve_address : address = storage.reserve in
     let burn_to_update : nat = abs(param.value * 7) in
