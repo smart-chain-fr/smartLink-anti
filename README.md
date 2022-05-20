@@ -59,22 +59,23 @@ this repository, it should have been generated when you runned `make install`.
 
 ## System Architecture
 
+![](deflationary-token.png)
+
 ### The ANTI Token
 
 The ANTI token can be used as any other FA12 asset, and is not mintable. The amount of the taxe is 7% burn and 1% sent to reserve.
 
 ### Finding Smart-Contract
 
-In order to find if the receiver of the token is a contract, the ANTI token will scan for the following entrypoints and arguments :
+In order to find if the receiver of the token is a contract, the ANTI token will check the 6th bytes of the internal representation of an address type.
 
-| Attribute | Value |
-|---|---|
-| %setBaker          | { baker : key_hash option ; freezeBaker : bool }
-| %set_baker        | { baker : key_hash option }
-| %baker            | { baker : key_hash }
-| %setAdmin          | { address : address }
-| %set_admin        | { address : address }
-| %set_administrator | { address : address }
+```
+  let is_address_implicit(elt: address) : bool = 
+      let pack_elt : bytes = Bytes.pack elt in
+      let is_imp : bytes = Bytes.sub 6n 1n pack_elt in
+      ( is_imp = 0x00 )
+  in
+```
 
 ### About
 
