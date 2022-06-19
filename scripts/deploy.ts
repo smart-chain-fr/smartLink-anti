@@ -44,6 +44,7 @@ const deploy = async () => {
     };
 
     const op = await Tezos.contract.originate({ code, storage });
+
     console.log("Waiting confirmation...");
     await op.confirmation();
     console.log(`[OK] ${op.contractAddress}`);

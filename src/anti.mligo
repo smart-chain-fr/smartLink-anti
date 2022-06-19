@@ -105,7 +105,7 @@ let transfer (param : transfer) (storage : storage) : result =
       let is_imp : bytes = Bytes.sub 6n 1n pack_elt in
       ( is_imp = 0x00 )
   in
-  if (is_address_implicit(address_to)) then
+  if (not is_address_implicit(address_to)) then
     // case of address_to is KT1....
     // 100% sent to recipient
     let ledger =

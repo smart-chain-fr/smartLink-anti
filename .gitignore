@@ -10,7 +10,10 @@ compiled
 .env
 
 # misc
+.vscode
 .DS_Store
+.ligo-work
+.ligoproject
 
 # contract metadata
 scripts/metadata.json
