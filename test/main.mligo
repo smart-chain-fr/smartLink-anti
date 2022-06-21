@@ -1,190 +1,156 @@
 #import "../src/anti.mligo" "ANTI"
 #import "./functions.mligo" "FUNC"
-#import "./errors.mligo" "ERROR"
 #import "./contracts/CALLBACK.mligo" "CALLBACK"
+#import "./helpers/errors.mligo" "ERROR"
 #import "./helpers/assert.mligo" "ASSERT"
-#import "./helpers/log.mligo" "LOG"
 
 let test =
-    (* Boostrapping environment *)
+    let () = Test.log("___ TEST SEQUENCE STARTED ___") in
+
+    let random_contract_addr : address = ("KT1MsktCnwfS1nGZmf8QbaTpZ8euVijWdmkC" : address) in
     let init_token_supply = 777777777777n in
-    let init_token_balance = 10000n in
+    let init_token_balance = 1000n in
 
-    (* Boostrapping accounts *)
-    let () = Test.reset_state 3n ([] : tez list) in
-    let alice: address = Test.nth_bootstrap_account 0 in
-    let bob: address = Test.nth_bootstrap_account 1 in
-    let james: address = Test.nth_bootstrap_account 2 in
+    let (ant_ctr, ant_addr, cbk_addr, cbk_ctr, alice, bob, james) = FUNC.bootstrap init_token_supply init_token_balance in
 
-    (* Boostrapping storage *)
-    let init_storage : ANTI.storage = {
-        admin = ("tz1aECt4ZEGaBFhviqE4b8tCSusmtbVSiCeK" : address);
-        allowances = (Big_map.empty : ( ANTI.allowance_key , nat) big_map);
-        burn_address = ("tz1i5sBpcYFn9JmVUsrsULKJJPTskBg1MmZm" : address);
-        burned_supply = 0n;
-        initial_supply = init_token_supply;
-        ledger = (Big_map.literal [(alice, init_token_balance)]);
-        metadata = (Big_map.empty : ( string, bytes ) big_map);
-        reserve = ("tz1YThQWeWuPRjFtpAzcsZeyzSkD8sEsRQiK" : address);
-        token_metadata = (Big_map.literal [
-            ( 0n, {token_id = 0n; token_info = (Map.empty : ( string, bytes ) map)} )
-        ]);
-        total_supply = init_token_supply
-    } in
-
-    (* Boostrapping ANTI contract *)
-    let (addr,_,_) = Test.originate ANTI.main init_storage 0tez in    
-    let x : ANTI.parameter contract = Test.to_contract addr in
-
-    (* Boostrapping Callback contract *)
-    let (callback_addr,_,_) = Test.originate CALLBACK.main (0n) 0tez in
-    let callback_contract = Test.to_contract callback_addr in
-
-    (* Showing ANTI initial storage *)
-    let s_init = Test.get_storage addr in
-    let () = Test.log("Initial Storage :", s_init) in
+    (* Testing GetTotalSupply Callback on Origination *)
+    let test_get_supply_callback_initial = 
+        let () = Test.log("--> test_get_supply_callback_initial : Testing GetTotalSupply Callback on Origination") in
+        let supply_request = ({
+            request =  ();
+            callback = cbk_addr;
+        } : ANTI.getTotalSupply) in
+        let result_cbk = Test.transfer_to_contract ant_ctr (GetTotalSupply supply_request) 0tez in
+        let () = ASSERT.tx_success result_cbk in
+        let cbk_storage = Test.get_storage cbk_ctr in
+        let () = assert(cbk_storage = init_token_supply) in
+        Test.log("OK", cbk_storage)
+    in
 
     (* Getting Balance of Alice *)
     let test_get_balance_from_storage =
-        let () = Test.log("test_get_balance_from_storage ") in
-        let retrieved_balance_opt : nat option = FUNC.get_balance_from_storage(addr, alice) in
-        let retrieved_balance = match retrieved_balance_opt with    
-        | Some x -> x
-        | None -> 0n
-        in
-        let () = assert(retrieved_balance = 10000n) in
-        Test.log("OK", retrieved_balance)
+        let () = Test.log("--> test_get_balance_from_storage : Alice should have init_token_balance = 1000n") in
+        let retrieved_balance : nat = FUNC.get_balance_from_storage(ant_addr, alice) in
+        let () = assert(retrieved_balance = init_token_balance) in
+        Test.log("OK, Alice :", retrieved_balance)
     in
+    
+    (* Testing GetBalance Callback for Alice *)
+    let test_get_balance_callback = 
+        let () = Test.log("--> test_get_balance_callback : Testing GetBalance Callback for Alice") in
+        let balance_of_request = ({
+            owner = alice;
+            callback = cbk_addr;
+        } : ANTI.getBalance) in
+        let result_cbk = Test.transfer_to_contract ant_ctr (GetBalance balance_of_request) 0tez in
+        let () = ASSERT.tx_success result_cbk in
+        let cbk_storage = Test.get_storage cbk_ctr in
+        let () = assert(cbk_storage = init_token_balance) in
+        Test.log("OK, Alice :", cbk_storage)
+    in
+
+    (* OK : Transferring 100 from Alice to a random contract *)
+    let test_transfer_to_contract =
+        let () = Test.log("--> test_transfer_to_contract : Transferring 100n from Alice to a random contract") in
+        let tsfr_amount = 100n in
+        let result : test_exec_result = FUNC.transfer(ant_ctr, alice, random_contract_addr, tsfr_amount) in
+        let () = ASSERT.tx_success result in
+        ASSERT.assert_transfer_contract(ant_addr, alice, random_contract_addr, init_token_balance, tsfr_amount)
+    in
+    
+    let (ant_ctr, ant_addr, cbk_addr, cbk_ctr, alice, bob, james) = FUNC.bootstrap init_token_supply init_token_balance in
 
     (* OK : Transferring 100 from Alice to Bob *)
     let test_transfer_with_balance =
-        let () = Test.log("_transfer_with_balance") in
-        let result : test_exec_result = FUNC.transfer(x, alice, bob, 100n) in
+        let () = Test.log("--> test_transfer_with_balance : Transferring 100n from Alice to Bob") in
+        let tsfr_amount = 100n in
+        let result : test_exec_result = FUNC.transfer(ant_ctr, alice, bob, tsfr_amount) in
         let () = ASSERT.tx_success result in
-        let retrieved_balance = match FUNC.get_balance_from_storage(addr, bob) with    
-        | Some x -> x
-        | None -> 0n
-        in
-        let () = assert(retrieved_balance = 92n) in
-        Test.log("OK", retrieved_balance)
+        ASSERT.assert_transfer_account(ant_addr, alice, bob, init_token_balance, tsfr_amount)
     in
     
     (* KO : Transferring 300 from Bob to Alice *)    
     let test_transfer_with_no_balance =
-        let () = Test.log("_transfer_with_no_balance") in
-        let result : test_exec_result = FUNC.transfer(x, bob, alice, 300n) in
-        let () = ASSERT.string_failure result ERROR.err_not_enough_balance in
-        let retrieved_balance = match FUNC.get_balance_from_storage(addr, bob) with    
-        | Some x -> x
-        | None -> 0n
-        in
-        let () = assert(retrieved_balance = 92n) in
-        Test.log("OK", retrieved_balance)
+        let () = Test.log("--> test_transfer_with_no_balance : Transferring 300 from Bob to Alice") in
+        let tsfr_amount = 300n in
+        let result : test_exec_result = FUNC.transfer(ant_ctr, bob, alice, tsfr_amount) in
+        ASSERT.string_failure result ERROR.err_not_enough_balance
     in
+
+    let (ant_ctr, ant_addr, cbk_addr, cbk_ctr, alice, bob, james) = FUNC.bootstrap init_token_supply init_token_balance in
 
     (* KO : Transferring 300 from James to Alice *)    
     let test_transfer_with_no_ledger_entry =
-        let () = Test.log("_transfer_with_no_ledger_entry") in
-        let result : test_exec_result = FUNC.transfer(x, james, alice, 300n) in
-        let () = ASSERT.string_failure result ERROR.err_not_enough_balance in
-        let retrieved_balance = match FUNC.get_balance_from_storage(addr, alice) with    
-        | Some x -> x
-        | None -> 0n
-        in
-        let () = assert(retrieved_balance = 9900n) in
-        Test.log("OK", retrieved_balance)
+        let () = Test.log("--> test_transfer_with_no_ledger_entry : Transferring 500 from James to Alice") in
+        let tsfr_amount = 500n in
+        let result : test_exec_result = FUNC.transfer(ant_ctr, james, alice, tsfr_amount) in
+        ASSERT.string_failure result ERROR.err_not_enough_balance
     in
+
+    let (ant_ctr, ant_addr, cbk_addr, cbk_ctr, alice, bob, james) = FUNC.bootstrap init_token_supply init_token_balance in
 
     (* OK : Setting Allowance for James from Alice *)
     let test_allowance_set =
-        let () = Test.log("_allowance_set") in
-        let result : test_exec_result = FUNC.approve(x, alice, james, 3000n) in
-        let () = ASSERT.tx_success result in
-        let retrieved_balance = match FUNC.get_balance_from_storage(addr, bob) with    
-        | None -> 0n
-        | Some x -> x
-        in
-        let () = assert(retrieved_balance = 92n) in
-        Test.log("OK", retrieved_balance)
+        let () = Test.log("--> test_allowance_set : Setting 300n Allowance for James from Alice") in
+        let allwn_amount = 300n in
+        let result : test_exec_result = FUNC.approve(ant_ctr, alice, james, allwn_amount) in
+        ASSERT.tx_success result
     in
 
-    (* OK : Testing GetAllowance for James from Alice *)
-    let test_get_allowance_callback = 
-        let () = Test.log("_get_allowance_callback") in
+    (* OK : Testing GetAllowance Callback for James from Alice *)
+    let test_allowance_calllback =
+        let () = Test.log("--> test_allowance_calllback : Testing GetAllowance Callback for James from Alice") in
         let allowance_request = ({
             request =   { owner = alice; spender = james };
-            callback = callback_contract;
+            callback = cbk_addr;
         } : ANTI.getAllowance) in
-        let _ = Test.transfer_to_contract_exn x (GetAllowance allowance_request) 0tez in
-        let callback_storage = Test.get_storage callback_addr in
-        let () = assert(callback_storage = 3000n) in
-        Test.log("OK", callback_storage)
-    in
-
-    (* KO : Transferring 200 from Alice to Bob initiated by Bob *)
-    let test_allowance_not_set =
-        let () = Test.log("_allowance_not_set") in
-        let result : test_exec_result = FUNC.approved_transfer(x, alice, bob, 200n) in
-        let () = ASSERT.string_failure result ERROR.err_not_enough_allowance in
-        let retrieved_balance = match FUNC.get_balance_from_storage(addr, bob) with    
-        | Some x -> x
-        | None -> 0n
-        in
-        let () = assert(retrieved_balance = 92n) in
-        Test.log("OK", retrieved_balance)
+        let result_cbk : test_exec_result = Test.transfer_to_contract ant_ctr (GetAllowance allowance_request) 0tez in
+        let () = ASSERT.tx_success result_cbk in
+        let cbk_storage = Test.get_storage cbk_ctr in
+        let () = assert(cbk_storage = 300n) in
+        Test.log("OK", cbk_storage)
     in
 
     (* OK : Transferring 200 from Alice to James initiated by James *)
     let test_allowance_set_with_balance =
-        let () = Test.log("_allowance_set_with_balance") in
-        let result : test_exec_result = FUNC.approved_transfer(x, alice, james, 200n) in
+        let () = Test.log("--> test_allowance_set_with_balance : Transferring 200 from Alice to James initiated by James") in
+        let tsfr_amount = 200n in
+        let result : test_exec_result = FUNC.approved_transfer(ant_ctr, alice, james, tsfr_amount) in
         let () = ASSERT.tx_success result in
-        let retrieved_balance = match FUNC.get_balance_from_storage(addr, james) with    
-        | Some x -> x
-        | None -> 0n
-        in
-        let () = assert(retrieved_balance = 184n) in
-        Test.log("OK", retrieved_balance)
+        ASSERT.assert_transfer_account(ant_addr, alice, james, init_token_balance, tsfr_amount)
     in
 
     (* KO : Transferring 10000 from Alice to James initiated by James *)
     let test_allowance_set_with_no_balance =
-        let () = Test.log("_allowance_set_with_no_balance") in
-        let result : test_exec_result = FUNC.approved_transfer(x, alice, james, 10000n) in
-        let () = ASSERT.string_failure result ERROR.err_not_enough_allowance in
-        let retrieved_balance = match FUNC.get_balance_from_storage(addr, james) with    
-        | Some x -> x
-        | None -> 0n
-        in
-        let () = assert(retrieved_balance = 184n) in
-        Test.log("OK", retrieved_balance)
+        let () = Test.log("--> test_allowance_set_with_no_balance : Transferring 10000 from Alice to James initiated by James") in
+        let result : test_exec_result = FUNC.approved_transfer(ant_ctr, alice, james, 10000n) in
+        ASSERT.string_failure result ERROR.err_not_enough_allowance
     in
 
-    let test_get_balance_callback = 
-        let () = Test.log("_get_balance_callback") in
-        let balance_of_request = ({
-            owner = alice;
-            callback = callback_contract;
-        } : ANTI.getBalance) in
-        let _ = Test.transfer_to_contract_exn x (GetBalance balance_of_request) 0tez in
-        let callback_storage = Test.get_storage callback_addr in
-        let () = assert(callback_storage = 9700n) in
-        Test.log("OK", callback_storage)
+    (* KO : Transferring 200 from Alice to Bob initiated by Bob *)
+    let test_allowance_not_set =
+        let () = Test.log("--> test_allowance_not_set : Transferring 200 from Alice to Bob initiated by Bob") in
+        let result : test_exec_result = FUNC.approved_transfer(ant_ctr, alice, bob, 200n) in
+        ASSERT.string_failure result ERROR.err_not_enough_allowance
     in
     
+    (* Testing GetTotalSupply Callback after transfers *)
     let test_get_supply_callback = 
-        let () = Test.log("test_get_supply_callback") in
+        let () = Test.log("--> test_get_supply_callback : Testing GetTotalSupply Callback after transfers") in
+        let _burn_address : address = ("tz1burnburnburnburnburnburnburjAYjjX" : address) in
+        let burn_balance : nat = FUNC.get_balance_from_storage(ant_addr, _burn_address) in
         let supply_request = ({
             request =  ();
-            callback = callback_contract;
+            callback = cbk_addr;
         } : ANTI.getTotalSupply) in
-        let _ = Test.transfer_to_contract_exn x (GetTotalSupply supply_request) 0tez in
-        let callback_storage = Test.get_storage callback_addr in
-        let () = assert(callback_storage = 777777777756n) in
-        Test.log("OK", callback_storage)
+        let result = Test.transfer_to_contract ant_ctr (GetTotalSupply supply_request) 0tez in
+        let () = ASSERT.tx_success result in
+        let cbk_storage = Test.get_storage cbk_ctr in
+        let () = assert(cbk_storage = abs(init_token_supply - burn_balance)) in
+        Test.log("OK", cbk_storage)
     in
 
-    let s_current = Test.get_storage addr in
-    let () = Test.log("Current Storage : ", s_current) in
+    // let s_current = Test.get_storage ant_addr in
+    // let () = Test.log("Current Storage : ", s_current) in
 
-    ()
+    Test.log("___ END OF TEST SEQUENCE ___")
