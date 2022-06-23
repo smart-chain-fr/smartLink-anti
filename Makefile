@@ -2,9 +2,7 @@ ifndef LIGO
 LIGO=docker run --platform linux/amd64 --rm -v "$(PWD)":"$(PWD)" -w "$(PWD)" ligolang/ligo:0.43.0
 endif
 
-PROTOCOL_OPT=--protocol ithaca
 JSON_OPT=--michelson-format json
-tsc=npx tsc
 
 help: ## show help
 	@grep -E '^[ a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -27,7 +25,7 @@ test: test_ligo  ## run integration tests
 
 test_ligo: test/main.mligo
 	@echo "Running integration tests..." 
-	@$(LIGO) run test $^ $(PROTOCOL_OPT)
+	@$(LIGO) run test $^
 
 deploy: ## deploy
 	@echo "Running deployment script..."

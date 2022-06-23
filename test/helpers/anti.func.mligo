@@ -1,7 +1,5 @@
-#import "../src/anti.mligo" "ANTI"
-#import "./contracts/CALLBACK.mligo" "CALLBACK"
-// #import "./helpers/errors.mligo" "ERROR"
-// #import "./helpers/assert.mligo" "ASSERT"
+#import "../../src/anti.mligo" "ANTI"
+#import "../contracts/CALLBACK.mligo" "CALLBACK"
 
 let bootstrap (init_token_supply : nat)(init_token_balance : nat) =
     let _burn_address : address = ("tz1burnburnburnburnburnburnburjAYjjX" : address) in
