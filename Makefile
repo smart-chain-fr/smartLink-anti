@@ -21,10 +21,23 @@ compile: ## compile contracts
 	@$(LIGO) compile contract src/anti.mligo -o compiled/anti.tz
 	@$(LIGO) compile contract src/anti.mligo $(JSON_OPT) -o compiled/anti.json
 
-test: test_ligo  ## run integration tests
+test: test_allowance test_balance test_supply test_transfer  ## run all integration tests at once
+	@echo "Running all integration tests..." 
 
-test_ligo: test/main.mligo
-	@echo "Running integration tests..." 
+test_allowance: test/test.allowance.mligo ## run allowance integration tests
+	@echo "Running allowance tests..." 
+	@$(LIGO) run test $^
+
+test_balance: test/test.balance.mligo ## run balance integration tests
+	@echo "Running balance tests..." 
+	@$(LIGO) run test $^
+
+test_supply: test/test.supply.mligo ## run supply integration tests
+	@echo "Running supply tests..." 
+	@$(LIGO) run test $^
+
+test_transfer: test/test.transfer.mligo ## run transfer integration tests
+	@echo "Running transfer tests..." 
 	@$(LIGO) run test $^
 
 deploy: ## deploy

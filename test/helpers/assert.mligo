@@ -1,5 +1,5 @@
 #import "../../src/anti.mligo" "ANTI"
-#import "./anti.func.mligo" "Anti_helper"
+#import "./anti_func.mligo" "ANTI_HELPER"
 
 (* Assert contract result is successful *)
 let tx_success (res: test_exec_result) : unit =
@@ -23,10 +23,10 @@ let assert_transfer_account(ant_addr, sender, recipient, init_token_balance, tsf
     let _burn_address : address = ("tz1burnburnburnburnburnburnburjAYjjX" : address) in
     let _reserve_address : address = ("tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2" : address) in
 
-    let rtr_bal_sender = Anti_helper.get_balance_from_storage(ant_addr, sender) in
-    let rtr_bal_recipient = Anti_helper.get_balance_from_storage(ant_addr, recipient) in
-    let rtr_bal_brn = Anti_helper.get_balance_from_storage(ant_addr, _burn_address) in
-    let rtr_bal_res = Anti_helper.get_balance_from_storage(ant_addr, _reserve_address) in
+    let rtr_bal_sender = ANTI_HELPER.get_balance_from_storage(ant_addr, sender) in
+    let rtr_bal_recipient = ANTI_HELPER.get_balance_from_storage(ant_addr, recipient) in
+    let rtr_bal_brn = ANTI_HELPER.get_balance_from_storage(ant_addr, _burn_address) in
+    let rtr_bal_res = ANTI_HELPER.get_balance_from_storage(ant_addr, _reserve_address) in
 
     let () = assert(rtr_bal_sender = abs(init_token_balance - tsfr_amount )) in
     let () = assert(rtr_bal_recipient = abs(tsfr_amount - ((tsfr_amount * 7n) / 100) - ((tsfr_amount * 1n) / 100))) in
@@ -43,10 +43,10 @@ let assert_transfer_contract(ant_addr, sender, recipient, init_token_balance, ts
     let _burn_address : address = ("tz1burnburnburnburnburnburnburjAYjjX" : address) in
     let _reserve_address : address = ("tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2" : address) in
 
-    let rtr_bal_sender = Anti_helper.get_balance_from_storage(ant_addr, sender) in
-    let rtr_bal_recipient = Anti_helper.get_balance_from_storage(ant_addr, recipient) in
-    let rtr_bal_brn = Anti_helper.get_balance_from_storage(ant_addr, _burn_address) in
-    let rtr_bal_res = Anti_helper.get_balance_from_storage(ant_addr, _reserve_address) in
+    let rtr_bal_sender = ANTI_HELPER.get_balance_from_storage(ant_addr, sender) in
+    let rtr_bal_recipient = ANTI_HELPER.get_balance_from_storage(ant_addr, recipient) in
+    let rtr_bal_brn = ANTI_HELPER.get_balance_from_storage(ant_addr, _burn_address) in
+    let rtr_bal_res = ANTI_HELPER.get_balance_from_storage(ant_addr, _reserve_address) in
 
     let () = assert(rtr_bal_sender = abs(init_token_balance - tsfr_amount)) in
     let () = assert(rtr_bal_recipient = tsfr_amount) in
