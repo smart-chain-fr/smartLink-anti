@@ -12,7 +12,10 @@ let test_transfer_to_contract (_ant_ctr : ANTI.parameter contract)(_alice : addr
     let () = Test.log("--> test_transfer_to_contract : Transferring 100 from Alice to a random contract") in
     let result : test_exec_result = ANTI_HELPER.transfer(_ant_ctr, _alice, ANTI_HELPER.base_config.random_contract_address, _tsfr_amount) in
     let () = ASSERT.tx_success result in
-    ANTI_HELPER.assert_transfer_contract(ant_addr, _alice, ANTI_HELPER.base_config.random_contract_address, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
+    let () = ANTI_HELPER.assert_transfer_contract (ant_addr, _alice, ANTI_HELPER.base_config.random_contract_address, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount) in
+    let () = ANTI_HELPER.assert_burn_address_balance (ant_addr, 0n) in
+    let () = ANTI_HELPER.assert_reserve_address_balance (ant_addr, 0n) in
+    ()
 
 let () = test_transfer_to_contract ant_ctr alice 100n
 
@@ -22,8 +25,10 @@ let test_transfer_with_balance (_ant_ctr, _ant_addr : ANTI.parameter contract * 
     let result : test_exec_result = ANTI_HELPER.transfer(_ant_ctr, _alice, _bob, _tsfr_amount) in
     let () = ASSERT.tx_success result in
     let ant_storage = Test.get_storage _ant_addr in
-    let () = Test.log ant_storage in
-    ANTI_HELPER.assert_transfer_account(_ant_addr, _alice, _bob, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
+    let () = ANTI_HELPER.assert_transfer_account (_ant_addr, _alice, _bob, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount) in
+    let () = ANTI_HELPER.assert_burn_address_balance (ant_addr,_tsfr_amount) in
+    let () = ANTI_HELPER.assert_reserve_address_balance (ant_addr,_tsfr_amount) in
+    ()
 
 let (ant_ctr, ant_addr, cbk_ctr, cbk_addr, alice, bob, james) = BOOTSTRAP.bootstrap_no_allowance ANTI_HELPER.base_config.init_token_supply ANTI_HELPER.base_config.init_token_balance
 let () = test_transfer_with_balance (ant_ctr, ant_addr) (alice, bob) 100n

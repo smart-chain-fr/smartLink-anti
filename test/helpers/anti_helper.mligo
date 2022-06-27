@@ -40,33 +40,31 @@ let approved_transfer(contr, from_, to_, amount_ : ANTI.parameter contract * add
 let assert_transfer_account(ant_addr, sender, recipient, init_token_balance, tsfr_amount : (ANTI.parameter, ANTI.storage) typed_address * address * address * nat * nat) : unit =
     let rtr_bal_sender = get_balance_from_storage(ant_addr, sender) in
     let rtr_bal_recipient = get_balance_from_storage(ant_addr, recipient) in
-    let rtr_bal_brn = get_balance_from_storage(ant_addr, base_config.burn_address) in
-    let rtr_bal_res = get_balance_from_storage(ant_addr, base_config.reserve_address) in
 
     let () = assert(rtr_bal_sender = abs(init_token_balance - tsfr_amount )) in
     let () = assert(rtr_bal_recipient = abs(tsfr_amount - ((tsfr_amount * base_config.burn_rate) / 100) - ((tsfr_amount * base_config.reserve_rate) / 100))) in
-    let () = assert(rtr_bal_brn = abs((tsfr_amount * base_config.burn_rate) / 100)) in
-    let () = assert(rtr_bal_res = abs((tsfr_amount * base_config.reserve_rate) / 100)) in
 
     let () = Test.log("OK, Sender :", rtr_bal_sender) in
     let () = Test.log("OK, Recipient :", rtr_bal_recipient) in
-    let () = Test.log("OK, Burn address :", rtr_bal_brn) in
-    let () = Test.log("OK, Reserve address :", rtr_bal_res) in
     ()
 
 let assert_transfer_contract(ant_addr, sender, recipient, init_token_balance, tsfr_amount : (ANTI.parameter, ANTI.storage) typed_address * address * address * nat * nat) : unit =
     let rtr_bal_sender = get_balance_from_storage(ant_addr, sender) in
     let rtr_bal_recipient = get_balance_from_storage(ant_addr, recipient) in
-    let rtr_bal_brn = get_balance_from_storage(ant_addr, base_config.burn_address) in
-    let rtr_bal_res = get_balance_from_storage(ant_addr, base_config.reserve_address) in
 
     let () = assert(rtr_bal_sender = abs(init_token_balance - tsfr_amount)) in
     let () = assert(rtr_bal_recipient = tsfr_amount) in
-    let () = assert(rtr_bal_brn = 0n) in
-    let () = assert(rtr_bal_res = 0n) in
 
     let () = Test.log("OK, Sender :", rtr_bal_sender) in
     let () = Test.log("OK, Recipient :", rtr_bal_recipient) in
-    let () = Test.log("OK, Burn address :", rtr_bal_brn) in
-    let () = Test.log("OK, Reserve address :", rtr_bal_res) in
     ()
+
+let assert_burn_address_balance (ant_addr, tsfr_amount : (ANTI.parameter, ANTI.storage) typed_address * nat) : unit  =
+    let rtr_bal_brn = get_balance_from_storage(ant_addr, base_config.burn_address) in
+    let () = assert(rtr_bal_brn = abs((tsfr_amount * base_config.burn_rate) / 100)) in
+    Test.log("OK, Burn address :", rtr_bal_brn)
+
+let assert_reserve_address_balance (ant_addr, tsfr_amount : (ANTI.parameter, ANTI.storage) typed_address * nat) : unit  =
+    let rtr_bal_rsv = get_balance_from_storage(ant_addr, base_config.reserve_address) in
+    let () = assert(rtr_bal_rsv = abs((tsfr_amount * base_config.reserve_rate) / 100)) in
+    Test.log("OK, Reserve address :", rtr_bal_rsv)
