@@ -1,6 +1,6 @@
 #import "../src/anti.mligo" "ANTI"
 #import "./contracts/callback.mligo" "CALLBACK"
-#import "./helpers/anti_func.mligo" "ANTI_HELPER"
+#import "./helpers/anti_helper.mligo" "ANTI_HELPER"
 #import "./helpers/bootstrap.mligo" "BOOTSTRAP"
 #import "./helpers/assert.mligo" "ASSERT"
 

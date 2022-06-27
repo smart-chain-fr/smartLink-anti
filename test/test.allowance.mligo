@@ -1,9 +1,8 @@
 #import "../src/anti.mligo" "ANTI"
 #import "./contracts/callback.mligo" "CALLBACK"
-#import "./helpers/anti_func.mligo" "ANTI_HELPER"
+#import "./helpers/anti_helper.mligo" "ANTI_HELPER"
 #import "./helpers/bootstrap.mligo" "BOOTSTRAP"
 #import "./helpers/assert.mligo" "ASSERT"
-#import "./helpers/errors.mligo" "ERROR"
 
 let () = Test.log("___ TEST ALLOWANCE STARTED ___")
 
@@ -27,8 +26,6 @@ let test_allowance_set (_ant_ctr : ANTI.parameter contract)(_cbk_ctr, _cbk_addr 
     Test.log("OK", storage_allowance)
 
 let () = test_allowance_set ant_ctr (cbk_ctr, cbk_addr) (alice, james) 300n
-
-// let (ant_ctr, ant_addr, cbk_ctr, cbk_addr, alice, bob, james) = BOOTSTRAP.bootstrap_with_allowance ANTI_HELPER.base_config.init_token_supply ANTI_HELPER.base_config.init_token_balance (alice, james, 300n)
 
 (* OK : Testing GetAllowance Callback for James from Alice *)
 let test_allowance_callback  (_cbk_ctr : nat contract)(_alice, _james : address * address) =
@@ -55,7 +52,7 @@ let test_allowance_set_with_balance (_ant_ctr, _ant_addr : ANTI.parameter contra
     let () = Test.log("--> test_allowance_set_with_balance : Transferring 200 from Alice to James initiated by James") in
     let result : test_exec_result = ANTI_HELPER.approved_transfer(_ant_ctr, _alice, _james, _tsfr_amount) in
     let () = ASSERT.tx_success result in
-    ASSERT.assert_transfer_account(_ant_addr, _alice, _james, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
+    ANTI_HELPER.assert_transfer_account(_ant_addr, _alice, _james, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
 
 let () = test_allowance_set_with_balance (ant_ctr, ant_addr) (alice, james) 200n
 
@@ -63,7 +60,7 @@ let () = test_allowance_set_with_balance (ant_ctr, ant_addr) (alice, james) 200n
 let test_allowance_set_with_no_balance (_ant_ctr : ANTI.parameter contract)(_alice, _james : address * address)(_tsfr_amount : nat) =
     let () = Test.log("--> test_allowance_set_with_no_balance : Transferring 10000 from Alice to James initiated by James") in
     let result : test_exec_result = ANTI_HELPER.approved_transfer(_ant_ctr, _alice, _james, _tsfr_amount) in
-    ASSERT.string_failure result ERROR.err_not_enough_allowance
+    ASSERT.string_failure result ANTI.ERROR.not_enough_allowance
 
 let () = test_allowance_set_with_no_balance ant_ctr (alice, james) 10000n
 
@@ -71,7 +68,7 @@ let () = test_allowance_set_with_no_balance ant_ctr (alice, james) 10000n
 let test_allowance_not_set (_ant_ctr : ANTI.parameter contract)(_alice, _bob : address * address)(_tsfr_amount : nat) =
     let () = Test.log("--> test_allowance_not_set : Transferring 200 from Alice to Bob initiated by Bob") in
     let result : test_exec_result = ANTI_HELPER.approved_transfer(_ant_ctr, _alice, _bob, _tsfr_amount) in
-    ASSERT.string_failure result ERROR.err_not_enough_allowance
+    ASSERT.string_failure result ANTI.ERROR.not_enough_allowance
 
 let () = test_allowance_not_set ant_ctr (alice, bob) 200n
 

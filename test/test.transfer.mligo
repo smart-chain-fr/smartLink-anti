@@ -1,8 +1,7 @@
 #import "../src/anti.mligo" "ANTI"
-#import "./helpers/anti_func.mligo" "ANTI_HELPER"
+#import "./helpers/anti_helper.mligo" "ANTI_HELPER"
 #import "./helpers/bootstrap.mligo" "BOOTSTRAP"
 #import "./helpers/assert.mligo" "ASSERT"
-#import "./helpers/errors.mligo" "ERROR"
 
 let () = Test.log("___ TEST TRANSFER STARTED ___")
 
@@ -13,7 +12,7 @@ let test_transfer_to_contract (_ant_ctr : ANTI.parameter contract)(_alice : addr
     let () = Test.log("--> test_transfer_to_contract : Transferring 100 from Alice to a random contract") in
     let result : test_exec_result = ANTI_HELPER.transfer(_ant_ctr, _alice, ANTI_HELPER.base_config.random_contract_address, _tsfr_amount) in
     let () = ASSERT.tx_success result in
-    ASSERT.assert_transfer_contract(ant_addr, _alice, ANTI_HELPER.base_config.random_contract_address, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
+    ANTI_HELPER.assert_transfer_contract(ant_addr, _alice, ANTI_HELPER.base_config.random_contract_address, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
 
 let () = test_transfer_to_contract ant_ctr alice 100n
 
@@ -24,7 +23,7 @@ let test_transfer_with_balance (_ant_ctr, _ant_addr : ANTI.parameter contract * 
     let () = ASSERT.tx_success result in
     let ant_storage = Test.get_storage _ant_addr in
     let () = Test.log ant_storage in
-    ASSERT.assert_transfer_account(_ant_addr, _alice, _bob, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
+    ANTI_HELPER.assert_transfer_account(_ant_addr, _alice, _bob, ANTI_HELPER.base_config.init_token_balance, _tsfr_amount)
 
 let (ant_ctr, ant_addr, cbk_ctr, cbk_addr, alice, bob, james) = BOOTSTRAP.bootstrap_no_allowance ANTI_HELPER.base_config.init_token_supply ANTI_HELPER.base_config.init_token_balance
 let () = test_transfer_with_balance (ant_ctr, ant_addr) (alice, bob) 100n
@@ -33,7 +32,7 @@ let () = test_transfer_with_balance (ant_ctr, ant_addr) (alice, bob) 100n
 let test_transfer_with_no_balance (_ant_ctr : ANTI.parameter contract)(_alice, _bob : address * address)(_tsfr_amount : nat) =
     let () = Test.log("--> test_transfer_with_no_balance : Transferring 300 from Bob to Alice") in
     let result : test_exec_result = ANTI_HELPER.transfer(_ant_ctr, _bob, _alice, _tsfr_amount) in
-    ASSERT.string_failure result ERROR.err_not_enough_balance
+    ASSERT.string_failure result ANTI.ERROR.not_enough_balance
 
 let () = test_transfer_with_no_balance ant_ctr (alice, bob) 300n
 
@@ -41,7 +40,7 @@ let () = test_transfer_with_no_balance ant_ctr (alice, bob) 300n
 let test_transfer_with_no_ledger_entry (_ant_ctr : ANTI.parameter contract)(_alice, _james : address * address)(_tsfr_amount : nat) =
     let () = Test.log("--> test_transfer_with_no_ledger_entry : Transferring 500 from James to Alice") in
     let result : test_exec_result = ANTI_HELPER.transfer(_ant_ctr, _james, _alice, _tsfr_amount) in
-    ASSERT.string_failure result ERROR.err_not_enough_balance
+    ASSERT.string_failure result ANTI.ERROR.not_enough_balance
 
 let () = test_transfer_with_no_ledger_entry ant_ctr (alice, james) 500n
 

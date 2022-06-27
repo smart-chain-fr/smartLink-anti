@@ -1,10 +1,8 @@
 #import "../../src/anti.mligo" "ANTI"
-#import "./anti_func.mligo" "ANTI_HELPER"
+#import "./anti_helper.mligo" "ANTI_HELPER"
 #import "../contracts/CALLBACK.mligo" "CALLBACK"
 
 let bootstrap (init_token_supply : nat)(init_token_balance : nat)(allowances_map : ( ANTI.allowance_key , nat) big_map) =
-    let _burn_address : address = ("tz1burnburnburnburnburnburnburjAYjjX" : address) in
-    let _reserve_address : address = ("tz1djkbrkYiuWFTgd3qUiViijGUuz2wBGxQ2" : address) in
         
     (* Boostrapping accounts *)
     let () = Test.reset_state 3n ([] : tez list) in
