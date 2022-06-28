@@ -1,3 +1,5 @@
+#import "errors.mligo" "ERROR"
+
 type transfer =
   [@layout:comb]
   { [@annot:from] address_from : address;
@@ -83,7 +85,7 @@ let transfer (param : transfer) (storage : storage) : result =
         | None -> 0n in
       let authorized_value =
         match is_nat (authorized_value - param.value) with
-        | None -> (failwith "NotEnoughAllowance" : nat)
+        | None -> (failwith ERROR.not_enough_allowance : nat)
         | Some authorized_value -> authorized_value in
       Big_map.update allowance_key (maybe authorized_value) allowances in
 
@@ -95,7 +97,7 @@ let transfer (param : transfer) (storage : storage) : result =
       | None -> 0n in
     let from_balance =
       match is_nat (from_balance - param.value) with
-      | None -> (failwith "NotEnoughBalance" : nat)
+      | None -> (failwith ERROR.not_enough_balance : nat)
       | Some from_balance -> from_balance in
     Big_map.update param.address_from (maybe from_balance) ledger in
 
@@ -105,7 +107,7 @@ let transfer (param : transfer) (storage : storage) : result =
       let is_imp : bytes = Bytes.sub 6n 1n pack_elt in
       ( is_imp = 0x00 )
   in
-  if (is_address_implicit(address_to)) then
+  if (not is_address_implicit(address_to)) then
     // case of address_to is KT1....
     // 100% sent to recipient
     let ledger =
@@ -172,7 +174,7 @@ let approve (param : approve) (storage : storage) : result =
     | None -> 0n in
   begin
     if previous_value > 0n && param.value > 0n
-    then (failwith "UnsafeAllowanceChange")
+    then (failwith ERROR.not_safe_allowance)
     else ();
     let allowances = Big_map.update allowance_key (maybe param.value) allowances in
     (([] : operation list), { storage with allowances = allowances })
