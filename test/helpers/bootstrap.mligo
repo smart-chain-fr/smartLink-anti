@@ -1,6 +1,6 @@
 #import "../../src/anti.mligo" "ANTI"
 #import "./anti_helper.mligo" "ANTI_HELPER"
-#import "../contracts/CALLBACK.mligo" "CALLBACK"
+#import "../contracts/callback.mligo" "CALLBACK"
 
 let bootstrap (init_token_supply : nat)(init_token_balance : nat)(allowances_map : ( ANTI.allowance_key , nat) big_map) =
         
